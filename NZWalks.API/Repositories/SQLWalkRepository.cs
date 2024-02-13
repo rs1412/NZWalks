@@ -24,7 +24,7 @@ namespace NZWalks.API.Repositories
         {
             var existingWalk = await dbContext.Walks.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (existingWalk == null) 
+            if (existingWalk == null)
             {
                 return null;
             }
@@ -35,7 +35,7 @@ namespace NZWalks.API.Repositories
 
         }
 
-        public async Task<List<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAscending = true)
+        public async Task<List<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAscending = true, int pageNumber = 1, int pageSize = 1000)
         {
             //Get the result in IQueryable variable
             var walks = dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
@@ -49,9 +49,9 @@ namespace NZWalks.API.Repositories
                 //Now to check filetron was on which column
                 if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
                 {
-                    walks = walks.Where(x=>x.Name.Contains(filterQuery));
+                    walks = walks.Where(x => x.Name.Contains(filterQuery));
                 }
-                
+
             }
 
             //Sorting
@@ -68,8 +68,11 @@ namespace NZWalks.API.Repositories
                 }
             }
 
-                return await walks.ToListAsync();
+            //Pagination
+            var skipResults = (pageNumber - 1) * pageSize;
+            return await walks.Skip(skipResults).Take(pageSize).ToListAsync();
 
+            //return await walks.ToListAsync();
             //return await dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();
         }
 
@@ -83,9 +86,9 @@ namespace NZWalks.API.Repositories
 
         public async Task<Walk?> UpdateAsync(Guid id, Walk walk)
         {
-            var existingWalk =  await dbContext.Walks.FirstOrDefaultAsync(x => x.Id == id);
+            var existingWalk = await dbContext.Walks.FirstOrDefaultAsync(x => x.Id == id);
 
-            if(existingWalk == null) 
+            if (existingWalk == null)
             {
                 return null;
             }
