@@ -45,9 +45,9 @@ namespace NZWalks.API.Controllers
         //api/walks?filterOn=name&filterQuery=Task
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string? filetrOn,string? filterQuery)
+        public async Task<IActionResult> GetAll([FromQuery] string? filetrOn,string? filterQuery, [FromQuery] string? sortBy, [FromQuery] bool? isAscending)
         { 
-            var walkDomainModal = await walkRepository.GetAllAsync(filetrOn, filterQuery);
+            var walkDomainModal = await walkRepository.GetAllAsync(filetrOn, filterQuery, sortBy, isAscending ?? true);
 
             //Map Domain Model to DTO
             return Ok(mapper.Map<List<WalkDto>>(walkDomainModal));

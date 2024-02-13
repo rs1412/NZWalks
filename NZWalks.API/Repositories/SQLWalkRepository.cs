@@ -35,7 +35,7 @@ namespace NZWalks.API.Repositories
 
         }
 
-        public async Task<List<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null)
+        public async Task<List<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null, string? sortBy = null, bool isAscending = true)
         {
             //Get the result in IQueryable variable
             var walks = dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
@@ -54,7 +54,21 @@ namespace NZWalks.API.Repositories
                 
             }
 
-            return await walks.ToListAsync();
+            //Sorting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                //Now to check filetron was on which column
+                if (sortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(x => x.Name) : walks.OrderByDescending(x => x.Name);
+                }
+                else if (sortBy.Equals("Length", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(x => x.LenghtInKm) : walks.OrderByDescending(x => x.LenghtInKm);
+                }
+            }
+
+                return await walks.ToListAsync();
 
             //return await dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();
         }
